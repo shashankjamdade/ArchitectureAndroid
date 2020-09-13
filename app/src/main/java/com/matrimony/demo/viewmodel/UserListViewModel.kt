@@ -1,9 +1,11 @@
 package com.matrimony.demo.viewmodel
 
 import androidx.lifecycle.*
+import com.matrimony.demo.model.ResultUserItem
 import com.matrimony.demo.model.UserListResponse
 import com.matrimony.demo.network.NetworkAPIService
 import com.matrimony.demo.repository.UserRepository
+import com.matrimony.demo.util.CommonUtils
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +28,11 @@ class UserListViewModel @Inject constructor(
             try {
                 val response = apiService?.fetchUsers(results)
                 if (response?.isSuccessful!!) {
-                    userRepository.insert(response.body()!!);
+                    response?.body()?.results?.forEachIndexed { index, resultUserItem ->
+                        resultUserItem?.userId = index?.toString()
+                        userRepository.insert(resultUserItem)
+                        CommonUtils.printLog("INTERATE","${resultUserItem?.userId}")
+                    }
                     userListMutableLiveData.postValue(response?.body())
                     loading.postValue(false)
                 } else {
@@ -42,6 +48,9 @@ class UserListViewModel @Inject constructor(
         }
     }
 
+    fun updateUserInfo(usr:ResultUserItem){
+        userRepository.updateUser(usr);
+    }
 
     fun fetchError(): LiveData<String> = errorOnAPI
     fun fetchLoadStatus(): LiveData<Boolean> = loading

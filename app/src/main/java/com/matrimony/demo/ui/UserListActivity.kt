@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import com.matrimony.demo.R
 import com.matrimony.demo.listener.DatabaseListener
 import com.matrimony.demo.listener.ItemClickListener
+import com.matrimony.demo.model.ResultUserItem
 import com.matrimony.demo.model.UserListResponse
 import com.matrimony.demo.repository.UserRepository
 import com.matrimony.demo.util.CommonUtils
@@ -26,11 +27,11 @@ import javax.inject.Inject
 class UserListActivity : DaggerAppCompatActivity(),
     ItemClickListener, DatabaseListener {
 
-    private var userListView : View? = null
-    lateinit var viewModel : UserListViewModel
-    private var userListAdapter : UserListAdapter? = null
-    private var clickedId : Int? = -1
-    var mContainerId:Int = -1
+    private var userListView: View? = null
+    lateinit var viewModel: UserListViewModel
+    private var userListAdapter: UserListAdapter? = null
+    private var clickedId: Int? = -1
+    var mContainerId: Int = -1
 //    var database: AppDatabase? = null
 
     @Inject
@@ -45,26 +46,30 @@ class UserListActivity : DaggerAppCompatActivity(),
         initViewModel()
         initAdapter()
 
-//        if(CommonUtils.isOnline(this)){
+        if (CommonUtils.isOnline(this)) {
             observeViewModel()
             viewModel.fetchUserListInfo(10)
-//        }else{
-//            DBOperations.getUserResponseFromDb(
-//                database,
-//                this,
-//                this,
-//                "userlist"
-//            )
-//        }
+        } else {
+            val mObservableProduct: LiveData<List<ResultUserItem>>? =
+                userRepository.getAllUsers();
+            mObservableProduct?.observe(this, object : Observer<List<ResultUserItem>> {
+                override fun onChanged(@Nullable itemlist: List<ResultUserItem>?) {
+                    CommonUtils.printLog("DATARETR----> ", "${Gson().toJson(itemlist)}")
+                    if(itemlist!=null){
+                        userListAdapter?.refreshAdapter(itemlist!!)
+                    }
+                }
+            })
+        }
     }
 
 
-
-    private fun initViewModel(){
-        viewModel = ViewModelProviders.of(this, viewmodelProviderFactory).get(UserListViewModel::class.java)
+    private fun initViewModel() {
+        viewModel =
+            ViewModelProviders.of(this, viewmodelProviderFactory).get(UserListViewModel::class.java)
     }
 
-    private fun initAdapter(){
+    private fun initAdapter() {
         userListAdapter = UserListAdapter(
             arrayListOf(),
             this@UserListActivity,
@@ -76,60 +81,48 @@ class UserListActivity : DaggerAppCompatActivity(),
         }
     }
 
-    private fun observeViewModel(){
+    private fun observeViewModel() {
 
-        val mObservableProduct: LiveData<UserListResponse>? =
-            userRepository.getAllUsers();
-        mObservableProduct?.observe(this, object : Observer<UserListResponse> {
-            override fun onChanged(@Nullable itemlist: UserListResponse?) {
-                userListAdapter?.refreshAdapter(itemlist?.results!!)
+        viewModel.fetchUsersLiveData().observe(this, Observer {
+            loading_progress.visibility = View.VISIBLE
+            it?.let {
+                val mObservableProduct: LiveData<List<ResultUserItem>>? =
+                    userRepository.getAllUsers();
+                mObservableProduct?.observe(this, object : Observer<List<ResultUserItem>> {
+                    override fun onChanged(@Nullable itemlist: List<ResultUserItem>?) {
+                        loading_progress.visibility = View.GONE
+                        CommonUtils.printLog("DATARETR----> ", "${Gson().toJson(itemlist)}")
+                        if(itemlist!=null){
+                            userListAdapter?.refreshAdapter(itemlist!!)
+                        }
+                    }
+                })
+//                userListAdapter?.refreshAdapter(it?.results!!)
             }
         })
-//        viewModel.fetchUsersLiveData().observe(this, Observer {
-//            it?.let {
-////                DBOperations.insertUsersInDb(
-////                    it, database, this,"userlist"
-////                )
-//                val mObservableProduct: LiveData<UserListResponse>? =
-//                    userRepository.getAllUsers();
-//                mObservableProduct?.observe(this, object : Observer<UserListResponse> {
-//                    override fun onChanged(@Nullable itemlist: UserListResponse?) {
-//                       CommonUtils.printLog("DATARETR----> ","${Gson().toJson(itemlist)}")
-//                        if(itemlist!=null){
-//                            userListAdapter?.refreshAdapter(itemlist?.results!!)
-//                        }
-//                    }
-//                })
-////                userListAdapter?.refreshAdapter(it?.results!!)
-//            }
-//        })
-//
-//        viewModel.fetchLoadStatus().observe(this, Observer {
-//            if(!it){
-//                println(it)
-//                loading_progress.visibility  = View.GONE
-//            }
-//        })
-//
-//        viewModel.fetchError().observe(this, Observer {
-//            it?.let {
-//                if(!TextUtils.isEmpty(it)){
-//                    Toast.makeText(this,"$it", Toast.LENGTH_LONG).show()
-//                }
-//
-//            }
-//        })
+
+        viewModel.fetchError().observe(this, Observer {
+            it?.let {
+                if (!TextUtils.isEmpty(it)) {
+                    Toast.makeText(this, "$it", Toast.LENGTH_LONG).show()
+                }
+
+            }
+        })
     }
 
 
     override fun setClickedInfo(data: Any?) {
+        if(data!=null && data is ResultUserItem){
+            viewModel?.updateUserInfo(data)
+        }
 //        clickedId = data.id
 //        launchDetailFragment()
     }
 
     override fun getUpdatedData(obj: Any?, apiName: String) {
-        if(apiName.equals("userlist")){
-            if(obj!=null && obj is UserListResponse){
+        if (apiName.equals("userlist")) {
+            if (obj != null && obj is UserListResponse) {
                 userListAdapter?.refreshAdapter(obj?.results!!)
             }
         }
