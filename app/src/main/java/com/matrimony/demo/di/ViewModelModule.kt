@@ -1,7 +1,6 @@
 package com.matrimony.demo.di
 
 import androidx.lifecycle.ViewModel
-import com.matrimony.demo.viewmodel.NoteViewModel
 import com.matrimony.demo.viewmodel.UserListViewModel
 import dagger.Binds
 import dagger.Module

@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.matrimony.demo.db.dao.UserDao
 import com.matrimony.demo.model.UserListResponse
-import com.matrimony.demo.persistence.NoteDao
-import com.matrimony.demo.persistence.Note
 import kotlinx.coroutines.*
 import javax.inject.Inject
 

@@ -1,6 +1,5 @@
 package com.matrimony.demo.di
 
-import com.matrimony.demo.ui.MainActivity
 import com.matrimony.demo.ui.UserListActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -11,7 +10,7 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class ActivityBuildersModule {
 
-    // Method #1
+//     Method #1
 //    @ContributesAndroidInjector(modules = [ViewModelModule::class,FragmentBuildersModule::class])
 //    abstract fun contributeMainActivity(): MainActivity
  // Method #2

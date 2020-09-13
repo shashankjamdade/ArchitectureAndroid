@@ -1,10 +1,8 @@
 package com.matrimony.demo.viewmodel
 
-import androidx.annotation.Nullable
 import androidx.lifecycle.*
 import com.matrimony.demo.model.UserListResponse
 import com.matrimony.demo.network.NetworkAPIService
-import com.matrimony.demo.repository.NoteRepository
 import com.matrimony.demo.repository.UserRepository
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch

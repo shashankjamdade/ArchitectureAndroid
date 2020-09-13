@@ -1,17 +1,21 @@
 package com.matrimony.demo.ui
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.Nullable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
 import com.matrimony.demo.R
 import com.matrimony.demo.listener.DatabaseListener
 import com.matrimony.demo.listener.ItemClickListener
 import com.matrimony.demo.model.UserListResponse
 import com.matrimony.demo.repository.UserRepository
+import com.matrimony.demo.util.CommonUtils
 import com.matrimony.demo.viewmodel.UserListViewModel
 import com.matrimony.demo.viewmodel.ViewModelProviderFactory
 import dagger.android.support.DaggerAppCompatActivity
@@ -90,13 +94,16 @@ class UserListActivity : DaggerAppCompatActivity(),
 //                    userRepository.getAllUsers();
 //                mObservableProduct?.observe(this, object : Observer<UserListResponse> {
 //                    override fun onChanged(@Nullable itemlist: UserListResponse?) {
-//                        userListAdapter?.refreshAdapter(itemlist?.results!!)
+//                       CommonUtils.printLog("DATARETR----> ","${Gson().toJson(itemlist)}")
+//                        if(itemlist!=null){
+//                            userListAdapter?.refreshAdapter(itemlist?.results!!)
+//                        }
 //                    }
 //                })
-//
+////                userListAdapter?.refreshAdapter(it?.results!!)
 //            }
 //        })
-
+//
 //        viewModel.fetchLoadStatus().observe(this, Observer {
 //            if(!it){
 //                println(it)

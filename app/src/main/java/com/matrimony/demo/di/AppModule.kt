@@ -3,9 +3,7 @@ package com.matrimony.demo.di
 import android.app.Application
 import androidx.room.Room
 import com.matrimony.demo.db.dao.UserDao
-import com.matrimony.demo.persistence.NoteDao
 import com.matrimony.demo.db.NoteDatabase
-import com.matrimony.demo.repository.NoteRepository
 import com.matrimony.demo.repository.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -22,10 +20,10 @@ class AppModule {
     @Provides
     fun providesAppDatabase(app:Application): NoteDatabase {
         return Room.databaseBuilder(app,
-            NoteDatabase::class.java,"note_database").build()
+            NoteDatabase::class.java,"demoapp_db").build()
     }
 
-    // Method #2
+//     Method #2
 //    @Singleton
 //    @Provides
 //    fun providesNoteDao(db: NoteDatabase): NoteDao {
@@ -39,7 +37,7 @@ class AppModule {
         return db.userDao()
     }
 
-    // Method #3
+//     Method #3
 //    @Provides
 //    fun providesRepository(noteDao: NoteDao):NoteRepository{
 //        return NoteRepository(noteDao)
